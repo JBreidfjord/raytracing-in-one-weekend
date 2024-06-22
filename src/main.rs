@@ -6,7 +6,9 @@ use indicatif::ProgressBar;
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
+mod hittable;
 mod ray;
+mod sphere;
 mod vec3;
 
 const fn calculate_image_height(image_width: f64, aspect_ratio: f64) -> u32 {
