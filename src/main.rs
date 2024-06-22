@@ -1,5 +1,7 @@
 use indicatif::ProgressBar;
 
+mod vec3;
+
 fn main() {
     const IMAGE_WIDTH: u64 = 256;
     const IMAGE_HEIGHT: u64 = 256;
