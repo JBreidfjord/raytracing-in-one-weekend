@@ -7,6 +7,7 @@ use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
 mod hittable;
+mod hittable_list;
 mod ray;
 mod sphere;
 mod vec3;

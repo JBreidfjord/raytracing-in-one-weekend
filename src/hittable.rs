@@ -34,6 +34,10 @@ impl HitRecord {
             -outward_normal
         };
     }
+
+    pub(crate) fn t(&self) -> &f64 {
+        &self.t
+    }
 }
 
 pub(crate) trait Hittable {
