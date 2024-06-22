@@ -21,13 +21,15 @@ impl Ray {
         &self.dir
     }
 
-    pub(crate) fn at(self, t: f64) -> Point3 {
-        self.orig + self.dir * t
+    pub(crate) fn at(&self, t: f64) -> Point3 {
+        self.origin() + self.direction() * t
     }
 
     pub(crate) fn color(&self) -> Color {
-        if hit_sphere(&Point3::new(0., 0., -1.), 0.5, self) {
-            return Color::new(1., 0., 0.);
+        let t = hit_sphere(&Point3::new(0., 0., -1.), 0.5, self);
+        if t > 0.0 {
+            let n = (self.at(t) - Vec3::new(0., 0., -1.)).unit();
+            return 0.5 * Color::new(n.x() + 1., n.y() + 1., n.z() + 1.);
         }
 
         let unit_direction = self.direction().unit();
@@ -38,13 +40,16 @@ impl Ray {
     }
 }
 
-fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> bool {
+fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> f64 {
     let oc = center - ray.origin();
     let a = ray.direction().dot(ray.direction());
     let b = -2. * ray.direction().dot(&oc);
     let c = oc.dot(&oc) - radius.powi(2);
     let discriminant = b * b - 4. * a * c;
-    // Discriminant will be negative if there are no real solutions,
-    // indicating that the ray has not hit the sphere
-    discriminant >= 0.0
+
+    if discriminant < 0.0 {
+        -1.0
+    } else {
+        (-b - discriminant.sqrt()) / (2. * a)
+    }
 }
