@@ -3,6 +3,8 @@ use std::ops::{
     Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
 
+use rand::Rng;
+
 use crate::interval::Interval;
 
 #[derive(Clone)]
@@ -20,6 +22,47 @@ impl Vec3 {
 
     pub const fn default() -> Self {
         Self { e: [0., 0., 0.] }
+    }
+
+    pub fn random() -> Self {
+        let mut rng = rand::thread_rng();
+        Self {
+            e: [rng.gen::<f64>(), rng.gen::<f64>(), rng.gen::<f64>()],
+        }
+    }
+
+    pub fn random_in_interval(min: f64, max: f64) -> Self {
+        let mut rng = rand::thread_rng();
+        Self {
+            e: [
+                rng.gen_range(min..max),
+                rng.gen_range(min..max),
+                rng.gen_range(min..max),
+            ],
+        }
+    }
+
+    pub fn random_in_unit_sphere() -> Self {
+        loop {
+            let p = Self::random_in_interval(-1., 1.);
+            if p.length_squared() < 1. {
+                return p;
+            }
+        }
+    }
+
+    pub fn random_unit_vector() -> Self {
+        Self::random_in_unit_sphere().unit()
+    }
+
+    pub fn random_on_hemisphere(normal: &Self) -> Self {
+        let on_unit_sphere = Self::random_unit_vector();
+        // Check if in the same hemisphere as the normal
+        if on_unit_sphere.dot(normal) > 0.0 {
+            on_unit_sphere
+        } else {
+            -on_unit_sphere
+        }
     }
 
     pub fn x(&self) -> f64 {

@@ -40,8 +40,12 @@ impl HitRecord {
         &self.normal
     }
 
-    pub const fn t(&self) -> &f64 {
-        &self.t
+    pub const fn t(&self) -> f64 {
+        self.t
+    }
+
+    pub const fn p(&self) -> &Point3 {
+        &self.p
     }
 }
 

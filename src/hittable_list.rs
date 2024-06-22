@@ -28,7 +28,7 @@ impl Hittable for HittableList {
         let mut maybe_record: Option<HitRecord> = None;
         for object in &self.objects {
             if let Some(hit_record) = object.hit(ray, &Interval::new(ray_t.min(), closest_so_far)) {
-                closest_so_far = *hit_record.t();
+                closest_so_far = hit_record.t();
                 maybe_record = Some(hit_record);
             }
         }
