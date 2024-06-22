@@ -46,6 +46,16 @@ impl Vec3 {
     pub(crate) fn unit(&self) -> Vec3 {
         self / self.length()
     }
+
+    pub(crate) fn format_color(&self) -> String {
+        format!(
+            "{} {} {}",
+            // Translate the [0,1] component values to the byte range [0,255]
+            (255.999 * self[0]) as u64,
+            (255.999 * self[1]) as u64,
+            (255.999 * self[2]) as u64,
+        )
+    }
 }
 
 impl Index<usize> for Vec3 {
