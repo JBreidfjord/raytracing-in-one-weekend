@@ -1,7 +1,7 @@
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
-pub(crate) struct HitRecord {
+pub struct HitRecord {
     p: Point3,
     normal: Vec3,
     t: f64,
@@ -9,8 +9,8 @@ pub(crate) struct HitRecord {
 }
 
 impl HitRecord {
-    pub(crate) fn new(p: Point3, normal: Vec3, t: f64) -> HitRecord {
-        HitRecord {
+    pub const fn new(p: Point3, normal: Vec3, t: f64) -> Self {
+        Self {
             p,
             normal,
             t,
@@ -27,7 +27,7 @@ impl HitRecord {
         // NOTE: the parameter `outward_normal` is assumed to have unit length.
         // TODO: Can we enforce this with the type system?
 
-        self.front_face = HitRecord::is_front_face(ray, &outward_normal);
+        self.front_face = Self::is_front_face(ray, &outward_normal);
         self.normal = if self.front_face {
             outward_normal
         } else {
@@ -35,15 +35,15 @@ impl HitRecord {
         };
     }
 
-    pub(crate) fn normal(&self) -> &Vec3 {
+    pub const fn normal(&self) -> &Vec3 {
         &self.normal
     }
 
-    pub(crate) fn t(&self) -> &f64 {
+    pub const fn t(&self) -> &f64 {
         &self.t
     }
 }
 
-pub(crate) trait Hittable {
+pub trait Hittable {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }

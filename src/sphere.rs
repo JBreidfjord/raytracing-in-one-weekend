@@ -2,21 +2,21 @@ use crate::hittable::{HitRecord, Hittable};
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
-pub(crate) struct Sphere {
+pub struct Sphere {
     center: Point3,
     radius: f64,
 }
 
 impl Sphere {
-    pub(crate) fn new(center: Point3, radius: f64) -> Sphere {
-        Sphere { center, radius }
+    pub const fn new(center: Point3, radius: f64) -> Self {
+        Self { center, radius }
     }
 
-    fn center(&self) -> &Point3 {
+    const fn center(&self) -> &Point3 {
         &self.center
     }
 
-    fn radius(&self) -> &f64 {
+    const fn radius(&self) -> &f64 {
         &self.radius
     }
 }
@@ -25,10 +25,10 @@ impl Hittable for Sphere {
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = self.center() - ray.origin();
         let a = ray.direction().length_squared();
-        let h = ray.direction().dot(&oc);
+        let half_b = ray.direction().dot(&oc);
         let c = oc.length_squared() - self.radius().powi(2);
 
-        let discriminant = h * h - a * c;
+        let discriminant = a.mul_add(-c, half_b.powi(2));
         if discriminant < 0.0 {
             return None;
         }
@@ -36,9 +36,9 @@ impl Hittable for Sphere {
         let sqrt_d = discriminant.sqrt();
 
         // Find the nearest root that lies in the acceptable range
-        let root = (h - sqrt_d) / a;
+        let root = (half_b - sqrt_d) / a;
         if root <= t_min || t_max <= root {
-            let root = (h + sqrt_d) / a;
+            let root = (half_b + sqrt_d) / a;
             if root <= t_min || t_max <= root {
                 return None;
             }

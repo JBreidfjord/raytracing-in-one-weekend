@@ -6,3 +6,19 @@ edition = "2021"
 [dependencies]
 image = "0.25.1"
 indicatif = "0.17.8"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+enum_glob_use = "deny"
+pedantic = "deny"
+nursery = "deny"
+unwrap_used = "deny"
+
+[profile.release]
+opt-level = 'z'     # Optimize for size
+lto = true          # Enable link time optimization
+codegen-units = 1   # Reduced to increase optimizations
+panic = 'abort'     # Abort on panic
+strip = 'symbols'   # Strip symbols from binary

@@ -1,32 +1,32 @@
 use crate::hittable::Hittable;
 use crate::vec3::{Color, Point3, Vec3};
 
-pub(crate) struct Ray {
+pub struct Ray {
     orig: Point3,
     dir: Vec3,
 }
 
 impl Ray {
-    pub(crate) fn new(origin: Point3, direction: Vec3) -> Ray {
-        Ray {
+    pub const fn new(origin: Point3, direction: Vec3) -> Self {
+        Self {
             orig: origin,
             dir: direction,
         }
     }
 
-    pub(crate) fn origin(&self) -> &Point3 {
+    pub const fn origin(&self) -> &Point3 {
         &self.orig
     }
 
-    pub(crate) fn direction(&self) -> &Vec3 {
+    pub const fn direction(&self) -> &Vec3 {
         &self.dir
     }
 
-    pub(crate) fn at(&self, t: f64) -> Point3 {
+    pub fn at(&self, t: f64) -> Point3 {
         self.origin() + self.direction() * t
     }
 
-    pub(crate) fn color(&self, world: &impl Hittable) -> Color {
+    pub fn color(&self, world: &impl Hittable) -> Color {
         if let Some(hit_record) = world.hit(self, 0.0, f64::INFINITY) {
             return 0.5 * (hit_record.normal() + Color::new(1., 1., 1.));
         }
