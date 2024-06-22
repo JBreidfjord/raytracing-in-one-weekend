@@ -133,6 +133,16 @@ impl Sub<&Vec3> for Vec3 {
     }
 }
 
+impl Sub<&Vec3> for &Vec3 {
+    type Output = Vec3;
+
+    fn sub(self, rhs: &Vec3) -> Self::Output {
+        Vec3 {
+            e: [self[0] - rhs[0], self[1] - rhs[1], self[2] - rhs[2]],
+        }
+    }
+}
+
 impl SubAssign for Vec3 {
     fn sub_assign(&mut self, rhs: Self) {
         *self = Vec3 {
