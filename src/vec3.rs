@@ -1,5 +1,7 @@
 use std::fmt::{Display, Formatter};
-use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};
+use std::ops::{
+    Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
+};
 
 use image::Rgb;
 
@@ -218,6 +220,16 @@ impl DivAssign<f64> for Vec3 {
         *self = Vec3 {
             e: [self[0] / rhs, self[1] / rhs, self[2] / rhs],
         };
+    }
+}
+
+impl Neg for Vec3 {
+    type Output = Vec3;
+
+    fn neg(self) -> Self::Output {
+        Vec3 {
+            e: [-self[0], -self[1], -self[2]],
+        }
     }
 }
 

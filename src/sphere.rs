@@ -1,6 +1,6 @@
 use crate::hittable::{HitRecord, Hittable};
 use crate::ray::Ray;
-use crate::vec3::Point3;
+use crate::vec3::{Point3, Vec3};
 
 pub(crate) struct Sphere {
     center: Point3,
@@ -42,7 +42,10 @@ impl Hittable for Sphere {
 
         let t = root;
         let p = ray.at(t);
-        let normal = (&p - self.center()) / *self.radius();
-        Some(HitRecord::new(p, normal, t))
+        let outward_normal = (&p - self.center()) / *self.radius();
+        let mut hit_record = HitRecord::new(p, Vec3::new(0., 0., 0.), t);
+        hit_record.set_face_normal(ray, outward_normal);
+
+        Some(hit_record)
     }
 }
