@@ -3,6 +3,8 @@ use std::ops::{
     Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
 
+use crate::interval::Interval;
+
 #[derive(Clone)]
 pub struct Vec3 {
     e: [f64; 3],
@@ -243,11 +245,12 @@ impl Display for Vec3 {
 
 impl From<Vec3> for image::Rgb<u8> {
     fn from(value: Vec3) -> Self {
+        let intensity = Interval::new(0.000, 0.999);
         #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
         Self([
-            (255.999 * value[0]) as u8,
-            (255.999 * value[1]) as u8,
-            (255.999 * value[2]) as u8,
+            (256. * intensity.clamp(value[0])) as u8,
+            (256. * intensity.clamp(value[1])) as u8,
+            (256. * intensity.clamp(value[2])) as u8,
         ])
     }
 }
