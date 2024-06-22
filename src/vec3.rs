@@ -32,8 +32,12 @@ impl Vec3 {
         self.e.iter().zip(other.e).map(|(u, v)| u * v).sum()
     }
 
+    pub(crate) fn length_squared(&self) -> f64 {
+        self.dot(self)
+    }
+
     pub(crate) fn length(&self) -> f64 {
-        self.dot(self).sqrt()
+        self.length_squared().sqrt()
     }
 
     pub(crate) fn cross(&self, other: &Vec3) -> Vec3 {
