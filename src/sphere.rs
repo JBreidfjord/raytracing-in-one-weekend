@@ -8,6 +8,10 @@ pub(crate) struct Sphere {
 }
 
 impl Sphere {
+    pub(crate) fn new(center: Point3, radius: f64) -> Sphere {
+        Sphere { center, radius }
+    }
+
     fn center(&self) -> &Point3 {
         &self.center
     }

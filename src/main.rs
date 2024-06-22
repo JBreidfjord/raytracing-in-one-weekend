@@ -3,7 +3,9 @@
 use image::{ImageBuffer, RgbImage};
 use indicatif::ProgressBar;
 
+use crate::hittable_list::HittableList;
 use crate::ray::Ray;
+use crate::sphere::Sphere;
 use crate::vec3::{Point3, Vec3};
 
 mod hittable;
@@ -27,6 +29,11 @@ fn main() {
     const IMAGE_WIDTH: u32 = 400;
     // Calculate the image height, and ensure that it's at least 1
     const IMAGE_HEIGHT: u32 = calculate_image_height(IMAGE_WIDTH as f64, ASPECT_RATIO);
+
+    // World
+    let mut world = HittableList::default();
+    world.add(Box::new(Sphere::new(Point3::new(0., 0., -1.), 0.5)));
+    world.add(Box::new(Sphere::new(Point3::new(0., -100.5, -1.), 100.)));
 
     // Camera
     const FOCAL_LENGTH: f64 = 1.;
@@ -62,7 +69,7 @@ fn main() {
         let ray_direction = pixel_center - &camera_center;
         let ray = Ray::new(camera_center.clone(), ray_direction);
 
-        let pixel_color = ray.color();
+        let pixel_color = ray.color(&world);
         *pixel = pixel_color.into();
     }
 

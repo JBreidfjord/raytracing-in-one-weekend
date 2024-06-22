@@ -6,9 +6,9 @@ pub(crate) struct HittableList {
 }
 
 impl HittableList {
-    pub(crate) fn new(object: Box<dyn Hittable>) -> HittableList {
+    pub(crate) fn default() -> HittableList {
         HittableList {
-            objects: vec![object],
+            objects: Vec::new(),
         }
     }
 

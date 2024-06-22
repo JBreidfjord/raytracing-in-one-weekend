@@ -3,8 +3,6 @@ use std::ops::{
     Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
 
-use image::Rgb;
-
 #[derive(Clone)]
 pub(crate) struct Vec3 {
     e: [f64; 3],
@@ -239,12 +237,12 @@ impl Display for Vec3 {
     }
 }
 
-impl Into<image::Rgb<u8>> for Vec3 {
-    fn into(self) -> Rgb<u8> {
-        Rgb([
-            (255.999 * self[0]) as u8,
-            (255.999 * self[1]) as u8,
-            (255.999 * self[2]) as u8,
+impl From<Vec3> for image::Rgb<u8> {
+    fn from(value: Vec3) -> Self {
+        image::Rgb([
+            (255.999 * value[0]) as u8,
+            (255.999 * value[1]) as u8,
+            (255.999 * value[2]) as u8,
         ])
     }
 }

@@ -1,3 +1,4 @@
+use crate::hittable::Hittable;
 use crate::vec3::{Color, Point3, Vec3};
 
 pub(crate) struct Ray {
@@ -25,11 +26,9 @@ impl Ray {
         self.origin() + self.direction() * t
     }
 
-    pub(crate) fn color(&self) -> Color {
-        let t = hit_sphere(&Point3::new(0., 0., -1.), 0.5, self);
-        if t > 0.0 {
-            let n = (self.at(t) - Vec3::new(0., 0., -1.)).unit();
-            return 0.5 * Color::new(n.x() + 1., n.y() + 1., n.z() + 1.);
+    pub(crate) fn color(&self, world: &impl Hittable) -> Color {
+        if let Some(hit_record) = world.hit(self, 0.0, f64::INFINITY) {
+            return 0.5 * (hit_record.normal() + Color::new(1., 1., 1.));
         }
 
         let unit_direction = self.direction().unit();
@@ -37,19 +36,5 @@ impl Ray {
         let white = Color::new(1., 1., 1.);
         let blue = Color::new(0.5, 0.7, 1.0);
         (1. - a) * white + a * blue
-    }
-}
-
-fn hit_sphere(center: &Point3, radius: f64, ray: &Ray) -> f64 {
-    let oc = center - ray.origin();
-    let a = ray.direction().length_squared();
-    let h = ray.direction().dot(&oc);
-    let c = oc.length_squared() - radius.powi(2);
-    let discriminant = h * h - a * c;
-
-    if discriminant < 0.0 {
-        -1.0
-    } else {
-        (h - discriminant.sqrt()) / a
     }
 }
