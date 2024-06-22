@@ -3,6 +3,7 @@ use indicatif::ProgressBar;
 
 use crate::vec3::Color;
 
+mod ray;
 mod vec3;
 
 fn main() {
