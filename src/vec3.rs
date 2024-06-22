@@ -1,6 +1,8 @@
 use std::fmt::{Display, Formatter};
 use std::ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};
 
+use image::Rgb;
+
 pub(crate) struct Vec3 {
     e: [f64; 3],
 }
@@ -45,16 +47,6 @@ impl Vec3 {
 
     pub(crate) fn unit(&self) -> Vec3 {
         self / self.length()
-    }
-
-    pub(crate) fn format_color(&self) -> String {
-        format!(
-            "{} {} {}",
-            // Translate the [0,1] component values to the byte range [0,255]
-            (255.999 * self[0]) as u64,
-            (255.999 * self[1]) as u64,
-            (255.999 * self[2]) as u64,
-        )
     }
 }
 
@@ -167,5 +159,15 @@ impl DivAssign<f64> for Vec3 {
 impl Display for Vec3 {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} {} {}", self[0], self[1], self[2])
+    }
+}
+
+impl Into<image::Rgb<u8>> for Vec3 {
+    fn into(self) -> Rgb<u8> {
+        Rgb([
+            (255.999 * self[0]) as u8,
+            (255.999 * self[1]) as u8,
+            (255.999 * self[2]) as u8,
+        ])
     }
 }
