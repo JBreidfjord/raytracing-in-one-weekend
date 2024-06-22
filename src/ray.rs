@@ -26,6 +26,10 @@ impl Ray {
     }
 
     pub(crate) fn color(&self) -> Color {
-        Color::new(0., 0., 0.)
+        let unit_direction = self.direction().unit();
+        let a = 0.5 * (unit_direction.y() + 1.0);
+        let white = Color::new(1., 1., 1.);
+        let blue = Color::new(0.5, 0.7, 1.0);
+        (1. - a) * white + a * blue
     }
 }
