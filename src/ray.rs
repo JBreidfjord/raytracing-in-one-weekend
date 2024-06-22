@@ -1,4 +1,5 @@
 use crate::hittable::Hittable;
+use crate::interval::Interval;
 use crate::vec3::{Color, Point3, Vec3};
 
 pub struct Ray {
@@ -27,7 +28,7 @@ impl Ray {
     }
 
     pub fn color(&self, world: &impl Hittable) -> Color {
-        if let Some(hit_record) = world.hit(self, 0.0, f64::INFINITY) {
+        if let Some(hit_record) = world.hit(self, &Interval::new(0.0, f64::INFINITY)) {
             return 0.5 * (hit_record.normal() + Color::new(1., 1., 1.));
         }
 
