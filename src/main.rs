@@ -4,6 +4,7 @@ use crate::sphere::Sphere;
 use crate::vec3::Point3;
 
 mod camera;
+mod color;
 mod hittable;
 mod hittable_list;
 mod interval;

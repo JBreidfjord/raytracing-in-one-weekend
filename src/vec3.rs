@@ -5,6 +5,7 @@ use std::ops::{
 
 use rand::Rng;
 
+use crate::color::linear_to_gamma;
 use crate::interval::Interval;
 
 #[derive(Clone)]
@@ -288,12 +289,21 @@ impl Display for Vec3 {
 
 impl From<Vec3> for image::Rgb<u8> {
     fn from(value: Vec3) -> Self {
+        let mut r = value.x();
+        let mut g = value.y();
+        let mut b = value.z();
+
+        // Apply a linear to gamma transform for gamma 2
+        r = linear_to_gamma(r);
+        g = linear_to_gamma(g);
+        b = linear_to_gamma(b);
+
         let intensity = Interval::new(0.000, 0.999);
         #[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
         Self([
-            (256. * intensity.clamp(value[0])) as u8,
-            (256. * intensity.clamp(value[1])) as u8,
-            (256. * intensity.clamp(value[2])) as u8,
+            (256. * intensity.clamp(r)) as u8,
+            (256. * intensity.clamp(g)) as u8,
+            (256. * intensity.clamp(b)) as u8,
         ])
     }
 }
