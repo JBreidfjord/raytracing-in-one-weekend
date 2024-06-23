@@ -106,7 +106,7 @@ impl Camera {
         }
 
         if let Some(hit_record) = world.hit(ray, &Interval::new(0.001, f64::INFINITY)) {
-            let direction = Vec3::random_on_hemisphere(hit_record.normal());
+            let direction = hit_record.normal() + Vec3::random_unit_vector();
             return 0.5
                 * Self::ray_color(
                     &Ray::new(hit_record.p().clone(), direction),
