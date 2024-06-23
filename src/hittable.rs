@@ -52,6 +52,10 @@ impl HitRecord {
     pub const fn p(&self) -> &Point3 {
         &self.p
     }
+
+    pub fn material(&self) -> Rc<dyn Material> {
+        self.mat.clone()
+    }
 }
 
 pub trait Hittable {

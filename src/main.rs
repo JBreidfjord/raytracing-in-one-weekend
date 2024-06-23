@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use crate::camera::Camera;
 use crate::hittable_list::HittableList;
-use crate::material::Lambertian;
+use crate::material::{Lambertian, Metal};
 use crate::sphere::Sphere;
 use crate::vec3::{Color, Point3};
 
@@ -24,19 +24,32 @@ const MAX_DEPTH: u32 = 50;
 
 fn main() {
     // Materials
-    let grey_diffuse = Rc::new(Lambertian::new(Color::new(128., 128., 128.)));
+    let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
+    let material_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
+    let material_left = Rc::new(Metal::new(Color::new(0.8, 0.8, 0.8)));
+    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2)));
 
     // World
     let mut world = HittableList::default();
     world.add(Rc::new(Sphere::new(
-        Point3::new(0., 0., -1.),
-        0.5,
-        grey_diffuse.clone(),
+        Point3::new(0.0, -100.5, -1.0),
+        100.0,
+        material_ground,
     )));
     world.add(Rc::new(Sphere::new(
-        Point3::new(0., -100.5, -1.),
-        100.,
-        grey_diffuse,
+        Point3::new(0.0, 0.0, -1.2),
+        0.5,
+        material_center,
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(-1.0, 0.0, -1.0),
+        0.5,
+        material_left,
+    )));
+    world.add(Rc::new(Sphere::new(
+        Point3::new(1.0, 0.0, -1.0),
+        0.5,
+        material_right,
     )));
 
     let camera = Camera::new(ASPECT_RATIO, IMAGE_WIDTH, SAMPLES_PER_PIXEL, MAX_DEPTH);
