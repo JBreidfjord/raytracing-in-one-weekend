@@ -103,6 +103,11 @@ impl Vec3 {
     pub fn unit(&self) -> Self {
         self / self.length()
     }
+
+    /// Returns true if the vector is close to zero in all dimensions
+    pub fn near_zero(&self) -> bool {
+        self.e.iter().all(|v| v.abs() < 1e-8)
+    }
 }
 
 impl Index<usize> for Vec3 {
