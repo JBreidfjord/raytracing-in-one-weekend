@@ -112,6 +112,13 @@ impl Vec3 {
     pub fn reflect(&self, n: &Self) -> Self {
         self - n * 2. * self.dot(n)
     }
+
+    pub fn refract(&self, n: &Self, etai_over_etat: f64) -> Self {
+        let cos_theta = self.neg().dot(n).min(1.);
+        let r_out_perp = etai_over_etat * (self + cos_theta * n);
+        let r_out_parallel = (1. - r_out_perp.length_squared()).abs().sqrt().neg() * n;
+        r_out_perp + r_out_parallel
+    }
 }
 
 impl Index<usize> for Vec3 {
@@ -252,6 +259,16 @@ impl Mul<Vec3> for f64 {
     }
 }
 
+impl Mul<&Vec3> for f64 {
+    type Output = Vec3;
+
+    fn mul(self, rhs: &Vec3) -> Self::Output {
+        Vec3 {
+            e: [self * rhs[0], self * rhs[1], self * rhs[2]],
+        }
+    }
+}
+
 impl Mul<Self> for Vec3 {
     type Output = Self;
 
@@ -315,6 +332,16 @@ impl Neg for Vec3 {
 
     fn neg(self) -> Self::Output {
         Self {
+            e: [-self[0], -self[1], -self[2]],
+        }
+    }
+}
+
+impl Neg for &Vec3 {
+    type Output = Vec3;
+
+    fn neg(self) -> Self::Output {
+        Vec3 {
             e: [-self[0], -self[1], -self[2]],
         }
     }

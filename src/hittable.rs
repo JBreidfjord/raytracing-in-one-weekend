@@ -56,6 +56,10 @@ impl HitRecord {
     pub fn material(&self) -> Rc<dyn Material> {
         self.mat.clone()
     }
+
+    pub const fn front_face(&self) -> bool {
+        self.front_face
+    }
 }
 
 pub trait Hittable {
