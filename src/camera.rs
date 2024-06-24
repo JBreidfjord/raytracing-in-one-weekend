@@ -1,5 +1,5 @@
 use image::{ImageBuffer, RgbImage};
-use indicatif::{ParallelProgressIterator, ProgressBar};
+use indicatif::ParallelProgressIterator;
 use rand::Rng;
 use rayon::prelude::*;
 
@@ -79,7 +79,6 @@ impl Camera {
     }
 
     pub fn render(&self, world: &HittableList) {
-        let bar = ProgressBar::new(self.image_height.into());
         let mut buffer: RgbImage = ImageBuffer::new(self.image_width, self.image_height);
         let length = buffer.len() as u64;
         buffer
@@ -97,7 +96,6 @@ impl Camera {
                 *pixel = pixel_color.into();
             });
 
-        bar.finish();
         buffer
             .save("image.png")
             .expect("Failed to save buffer to image");
