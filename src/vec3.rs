@@ -3,7 +3,7 @@ use std::ops::{
     Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign,
 };
 
-use rand::Rng;
+use rand::{Rng, thread_rng};
 
 use crate::color::linear_to_gamma;
 use crate::interval::Interval;
@@ -63,6 +63,18 @@ impl Vec3 {
             on_unit_sphere
         } else {
             -on_unit_sphere
+        }
+    }
+
+    pub fn random_in_unit_disk() -> Self {
+        let mut rng = thread_rng();
+        loop {
+            let p = Self {
+                e: [rng.gen_range(-1.0..0.0), rng.gen_range(-1.0..1.0), 0.0],
+            };
+            if p.length_squared() < 1. {
+                return p;
+            }
         }
     }
 

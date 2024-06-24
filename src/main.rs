@@ -25,6 +25,8 @@ const VFOV: f64 = 20.;
 const LOOK_FROM: Point3 = Point3::new(-2., 2., 1.);
 const LOOK_AT: Point3 = Point3::new(0., 0., -1.);
 const VUP: Vec3 = Vec3::new(0., 1., 0.);
+const DEFOCUS_ANGLE: f64 = 10.;
+const FOCUS_DIST: f64 = 3.4;
 
 fn main() {
     // Materials
@@ -71,6 +73,8 @@ fn main() {
         LOOK_FROM,
         LOOK_AT,
         VUP,
+        DEFOCUS_ANGLE,
+        FOCUS_DIST,
     );
 
     camera.render(&world);
