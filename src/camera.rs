@@ -12,12 +12,20 @@ pub struct Camera {
     image_width: u32,         // Rendered image width in pixel count
     samples_per_pixel: u32,   // Count of random samples for each pixel
     max_depth: u32,           // Maximum number of ray bounces in scene
+    vfov: f64,                // Vertical view angle (field of view)
+    look_from: Point3,        // Point camera is looking from
+    look_at: Point3,          // Point camera is looking at
+    vup: Vec3,                // Camera-relative "up" direction
     image_height: u32,        // Rendered image height
     pixel_samples_scale: f64, // Color scale factor for a sum of pixel samples
     center: Point3,           // Camera center
     pixel00_loc: Point3,      // Location of pixel (0, 0)
     pixel_delta_u: Vec3,      // Offset to pixel to the right
     pixel_delta_v: Vec3,      // Offset to pixel below
+    // Camera frame basis vectors
+    u: Vec3,
+    v: Vec3,
+    w: Vec3,
 }
 
 impl Camera {
@@ -26,18 +34,29 @@ impl Camera {
         image_width: u32,
         samples_per_pixel: u32,
         max_depth: u32,
+        vfov: f64,
+        look_from: Point3,
+        look_at: Point3,
+        vup: Vec3,
     ) -> Self {
         let mut cam = Self {
             aspect_ratio,
             image_width,
             samples_per_pixel,
             max_depth,
+            vfov,
+            look_from,
+            look_at,
+            vup,
             image_height: 1,
             pixel_samples_scale: 1.0,
             center: Point3::default(),
             pixel00_loc: Point3::default(),
             pixel_delta_u: Vec3::default(),
             pixel_delta_v: Vec3::default(),
+            u: Vec3::default(),
+            v: Vec3::default(),
+            w: Vec3::default(),
         };
         cam.initialize();
 
@@ -77,17 +96,23 @@ impl Camera {
 
         self.pixel_samples_scale = 1. / f64::from(self.samples_per_pixel);
 
-        self.center = Point3::new(0., 0., 0.);
+        self.center = self.look_from.clone();
 
         // Determine viewport dimensions
-        let focal_length = 1.;
-        let viewport_height = 2.;
+        let focal_length = (&self.look_from - &self.look_at).length();
+        let theta = self.vfov.to_radians();
+        let h = (theta / 2.).tan();
+        let viewport_height = 2. * h * focal_length;
         let viewport_width =
             viewport_height * f64::from(self.image_width) / f64::from(self.image_height);
 
+        self.w = (&self.look_from - &self.look_at).unit();
+        self.u = self.vup.cross(&self.w).unit();
+        self.v = self.w.cross(&self.u);
+
         // Calculate the vectors across the horizontal and down the vertical viewport edges
-        let viewport_u = Vec3::new(viewport_width, 0., 0.);
-        let viewport_v = Vec3::new(0., -viewport_height, 0.);
+        let viewport_u = viewport_width * &self.u;
+        let viewport_v = viewport_height * -&self.v;
 
         // Calculate the horizontal and vertical delta vectors from pixel to pixel
         self.pixel_delta_u = &viewport_u / self.image_width.into();
@@ -95,7 +120,7 @@ impl Camera {
 
         // Calculate the location of the upper left pixel
         let viewport_upper_left =
-            &self.center - Vec3::new(0., 0., focal_length) - viewport_u / 2. - viewport_v / 2.;
+            &self.center - (focal_length * &self.w) - viewport_u / 2. - viewport_v / 2.;
         self.pixel00_loc = viewport_upper_left + 0.5 * (&self.pixel_delta_u + &self.pixel_delta_v);
     }
 

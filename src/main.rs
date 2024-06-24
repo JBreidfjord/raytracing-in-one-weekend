@@ -4,7 +4,7 @@ use crate::camera::Camera;
 use crate::hittable_list::HittableList;
 use crate::material::{Dielectric, Lambertian, Metal};
 use crate::sphere::Sphere;
-use crate::vec3::{Color, Point3};
+use crate::vec3::{Color, Point3, Vec3};
 
 mod camera;
 mod color;
@@ -21,6 +21,10 @@ const ASPECT_RATIO: f64 = 16. / 9.;
 const IMAGE_WIDTH: u32 = 400;
 const SAMPLES_PER_PIXEL: u32 = 100;
 const MAX_DEPTH: u32 = 50;
+const VFOV: f64 = 20.;
+const LOOK_FROM: Point3 = Point3::new(-2., 2., 1.);
+const LOOK_AT: Point3 = Point3::new(0., 0., -1.);
+const VUP: Vec3 = Vec3::new(0., 1., 0.);
 
 fn main() {
     // Materials
@@ -58,7 +62,16 @@ fn main() {
         material_right,
     )));
 
-    let camera = Camera::new(ASPECT_RATIO, IMAGE_WIDTH, SAMPLES_PER_PIXEL, MAX_DEPTH);
+    let camera = Camera::new(
+        ASPECT_RATIO,
+        IMAGE_WIDTH,
+        SAMPLES_PER_PIXEL,
+        MAX_DEPTH,
+        VFOV,
+        LOOK_FROM,
+        LOOK_AT,
+        VUP,
+    );
 
     camera.render(&world);
 }
