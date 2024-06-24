@@ -370,6 +370,7 @@ dependencies = [
  "instant",
  "number_prefix",
  "portable-atomic",
+ "rayon",
  "unicode-width",
 ]
 
@@ -783,6 +784,7 @@ dependencies = [
  "image",
  "indicatif",
  "rand",
+ "rayon",
 ]
 
 [[package]]

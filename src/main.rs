@@ -1,8 +1,8 @@
-use std::rc::Rc;
+use rand::{Rng, thread_rng};
 
 use crate::camera::Camera;
 use crate::hittable_list::HittableList;
-use crate::material::{Dielectric, Lambertian, Metal};
+use crate::material::Material::{Dielectric, Lambertian, Metal};
 use crate::sphere::Sphere;
 use crate::vec3::{Color, Point3, Vec3};
 
@@ -16,65 +16,96 @@ mod ray;
 mod sphere;
 mod vec3;
 
-// Image constants
-const ASPECT_RATIO: f64 = 16. / 9.;
-const IMAGE_WIDTH: u32 = 400;
-const SAMPLES_PER_PIXEL: u32 = 100;
-const MAX_DEPTH: u32 = 50;
-const VFOV: f64 = 20.;
-const LOOK_FROM: Point3 = Point3::new(-2., 2., 1.);
-const LOOK_AT: Point3 = Point3::new(0., 0., -1.);
-const VUP: Vec3 = Vec3::new(0., 1., 0.);
-const DEFOCUS_ANGLE: f64 = 10.;
-const FOCUS_DIST: f64 = 3.4;
-
 fn main() {
-    // Materials
-    let material_ground = Rc::new(Lambertian::new(Color::new(0.8, 0.8, 0.0)));
-    let material_center = Rc::new(Lambertian::new(Color::new(0.1, 0.2, 0.5)));
-    let material_left = Rc::new(Dielectric::new(1.5));
-    let material_bubble = Rc::new(Dielectric::new(1.0 / 1.5));
-    let material_right = Rc::new(Metal::new(Color::new(0.8, 0.6, 0.2), 1.0));
-
-    // World
     let mut world = HittableList::default();
-    world.add(Rc::new(Sphere::new(
-        Point3::new(0.0, -100.5, -1.0),
-        100.0,
-        material_ground,
+
+    world.add(Box::new(Sphere::new(
+        Point3::new(0., -1000., 0.),
+        1000.,
+        Lambertian {
+            albedo: Color::new(0.5, 0.5, 0.5),
+        },
     )));
-    world.add(Rc::new(Sphere::new(
-        Point3::new(0.0, 0.0, -1.2),
-        0.5,
-        material_center,
+
+    let mut rng = thread_rng();
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat = rng.gen::<f64>();
+            let center = Point3::new(
+                0.9f64.mul_add(rng.gen(), a.into()),
+                0.2,
+                0.9f64.mul_add(rng.gen(), b.into()),
+            );
+            if (&center - Point3::new(4., 0.2, 0.)).length() <= 0.9 {
+                continue;
+            }
+
+            match choose_mat {
+                ..0.8 => {
+                    // diffuse
+                    let albedo = Color::random() * Color::random();
+                    let sphere_material = Lambertian { albedo };
+                    world.add(Box::new(Sphere::new(center.clone(), 0.2, sphere_material)));
+                }
+                0.8..0.95 => {
+                    // metal
+                    let albedo = Color::random_in_interval(0.5, 1.);
+                    let fuzz = rng.gen_range(0.0..0.5);
+                    let sphere_material = Metal { albedo, fuzz };
+                    world.add(Box::new(Sphere::new(center.clone(), 0.2, sphere_material)));
+                }
+                _ => {
+                    // glass
+                    let sphere_material = Dielectric {
+                        refraction_index: 1.5,
+                        color: Color::new(1., 1., 1.),
+                    };
+                    world.add(Box::new(Sphere::new(center.clone(), 0.2, sphere_material)));
+                }
+            }
+        }
+    }
+
+    let material_1 = Dielectric {
+        refraction_index: 1.5,
+        color: Color::new(1., 1., 1.),
+    };
+    world.add(Box::new(Sphere::new(
+        Point3::new(0., 1., 0.),
+        1.,
+        material_1,
     )));
-    world.add(Rc::new(Sphere::new(
-        Point3::new(-1.0, 0.0, -1.0),
-        0.5,
-        material_left,
+
+    let material_2 = Lambertian {
+        albedo: Color::new(0.4, 0.2, 0.1),
+    };
+    world.add(Box::new(Sphere::new(
+        Point3::new(-4., 1., 0.),
+        1.,
+        material_2,
     )));
-    world.add(Rc::new(Sphere::new(
-        Point3::new(-1.0, 0.0, -1.0),
-        0.4,
-        material_bubble,
-    )));
-    world.add(Rc::new(Sphere::new(
-        Point3::new(1.0, 0.0, -1.0),
-        0.5,
-        material_right,
+
+    let material_3 = Metal {
+        albedo: Color::new(0.7, 0.6, 0.5),
+        fuzz: 0.,
+    };
+    world.add(Box::new(Sphere::new(
+        Point3::new(4., 1., 0.),
+        1.,
+        material_3,
     )));
 
     let camera = Camera::new(
-        ASPECT_RATIO,
-        IMAGE_WIDTH,
-        SAMPLES_PER_PIXEL,
-        MAX_DEPTH,
-        VFOV,
-        LOOK_FROM,
-        LOOK_AT,
-        VUP,
-        DEFOCUS_ANGLE,
-        FOCUS_DIST,
+        16. / 9.,
+        1200,
+        500,
+        50,
+        20.,
+        Point3::new(13., 2., 3.),
+        Point3::new(0., 0., 0.),
+        Vec3::new(0., 1., 0.),
+        0.6,
+        10.,
     );
 
     camera.render(&world);

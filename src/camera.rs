@@ -1,8 +1,10 @@
 use image::{ImageBuffer, RgbImage};
-use indicatif::ProgressBar;
+use indicatif::{ParallelProgressIterator, ProgressBar};
 use rand::Rng;
+use rayon::prelude::*;
 
 use crate::hittable::Hittable;
+use crate::hittable_list::HittableList;
 use crate::interval::Interval;
 use crate::ray::Ray;
 use crate::vec3::{Color, Point3, Vec3};
@@ -76,26 +78,24 @@ impl Camera {
         cam
     }
 
-    pub fn render(&self, world: &impl Hittable) {
+    pub fn render(&self, world: &HittableList) {
         let bar = ProgressBar::new(self.image_height.into());
         let mut buffer: RgbImage = ImageBuffer::new(self.image_width, self.image_height);
-        let mut prev_y = self.image_height + 1; // Start at a value outside the image
-        for (x, y, pixel) in buffer.enumerate_pixels_mut() {
-            // Increment the progress bar on new scan lines
-            if y != prev_y {
-                bar.inc(1);
-                prev_y = y;
-            }
+        let length = buffer.len() as u64;
+        buffer
+            .par_enumerate_pixels_mut()
+            .into_par_iter()
+            .progress_count(length)
+            .for_each(|(x, y, pixel)| {
+                let mut pixel_color = Color::new(0., 0., 0.);
+                for _ in 0..self.samples_per_pixel {
+                    let ray = self.get_ray(x.into(), y.into());
+                    pixel_color += Self::ray_color(&ray, self.max_depth, world);
+                }
 
-            let mut pixel_color = Color::new(0., 0., 0.);
-            for _ in 0..self.samples_per_pixel {
-                let ray = self.get_ray(x.into(), y.into());
-                pixel_color += Self::ray_color(&ray, self.max_depth, world);
-            }
-
-            pixel_color *= self.pixel_samples_scale;
-            *pixel = pixel_color.into();
-        }
+                pixel_color *= self.pixel_samples_scale;
+                *pixel = pixel_color.into();
+            });
 
         bar.finish();
         buffer
@@ -141,7 +141,7 @@ impl Camera {
         self.defocus_disk_v = &self.v * defocus_radius;
     }
 
-    fn ray_color(ray: &Ray, depth: u32, world: &impl Hittable) -> Color {
+    fn ray_color(ray: &Ray, depth: u32, world: &dyn Hittable) -> Color {
         // If we've exceeded the ray bounce limit, no more light is gathered
         if depth == 0 {
             return Color::new(0., 0., 0.);
