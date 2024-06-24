@@ -95,18 +95,18 @@ fn main() {
         material_3,
     )));
 
-    let camera = Camera::new(
-        16. / 9.,
-        1200,
-        500,
-        50,
-        20.,
-        Point3::new(13., 2., 3.),
-        Point3::new(0., 0., 0.),
-        Vec3::new(0., 1., 0.),
-        0.6,
-        10.,
-    );
+    let camera = Camera::builder()
+        .aspect_ratio(16. / 9.)
+        .image_width(1200)
+        .samples_per_pixel(500)
+        .max_depth(50)
+        .vfov(20.)
+        .look_from(Point3::new(13., 2., 3.))
+        .look_at(Point3::new(0., 0., 0.))
+        .vup(Vec3::new(0., 1., 0.))
+        .defocus_angle(0.6)
+        .focus_dist(10.)
+        .build();
 
     camera.render(&world);
 }
